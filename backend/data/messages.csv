@@ -1,0 +1,16 @@
+id,recommendation_id,subject_type,subject_id,channel,recipient,body,status,attempts,provider_ref,error,created_at,sent_at
+msg_01a13ef5358451338cfd76,rec_01a13eebed0324d95e2479,policy,pol_pf057,intermediary,Tidewater Brokerage,"Subject: Payment reminder for your client
+
+Your client’s annual premium of 25,500.00 USD for the Group Life Scheme is overdue since 2025-10-14. Cover is currently in the grace period, which ends on 2025-11-13. Please follow up with your client.
+
+Insurer operations team
+
+Pay online: https://portal.example.com/pay/GRP-2025-01157",delivered,1,mock-intermediary-338cfd76,,2026-10-15T09:46:59.845839+00:00,2026-10-15T09:47:00.000075+00:00
+msg_01a13f51bcb76d02902d03,rec_01a13f44554c85a4fd8e3b,policy,pol_pf047,email_sms,"michael.owens.147@example.com, 971552010147","Subject: Your Term Life Protection
+
+Hi Michael, your Term Life Protection is due for a service review. If you’d like to talk through your Life & protection needs, please get in touch.
+
+Your financial adviser",delivered,1,mock-email_sms-02902d03,,2026-10-15T11:28:03.767401+00:00,2026-10-15T11:28:03.948878+00:00
+msg_01a13fe8422af21c8e5f76,rec_01a13f4416ca418bd854ac,policy,pol_pf029,email_sms,"odette.oak.129@example.com, 971552010129","Subject: Your Term Life Protection
+
+Hi Odette, your Term Life Protection is due. If you’d like to review your Life & protection needs or talk through your monthly premium, please get in touch. Your financial adviser",delivered,1,mock-email_sms-1c8e5f76,,2026-10-15T14:12:28.330642+00:00,2026-10-15T14:12:28.502095+00:00

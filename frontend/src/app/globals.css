@@ -1,0 +1,240 @@
+/* InsureOps design system · light only
+ * Layout and palette follow the operations-dashboard wireframes: midnight sidebar, slate canvas,
+ * white cards with soft shadows, ice-blue tints for quiet surfaces, cobalt primary and four
+ * reserved status colours (positive / warning / danger / info) that always ship with a label.
+ * display: Plus Jakarta Sans · body: Inter · mono: Geist Mono
+ * shadcn/ui tokens (--background, --primary, ...) are mapped onto the same palette.
+ */
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Light only: `dark:` utilities fire only under an explicit .dark class, which the app never sets. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --canvas: #f4f7fb;
+  --card-bg: #ffffff;
+  --ice: #f8fafc;
+  --ice-2: #eef6ff;
+  --ice-3: #edf3ff;
+  --rule: #dfe6ef;
+  --rule-2: #cdd7e4;
+
+  /* Ink (muted is darkened from the wireframe's #64748B so small text clears 4.5:1 on the canvas) */
+  --ink: #18283e;
+  --ink-2: #33445c;
+  --neutral: #4b5b72;
+  --muted-ink: #56667d;
+  --faint: #8794a8;
+
+  /* Brand */
+  --brand: #004ac6;
+  --brand-hover: #2563eb;
+  --brand-soft: #edf3ff;
+  --brand-ink: #ffffff;
+  --focus: #2563eb;
+
+  /* Navigation */
+  --nav: #0a1128;
+  --nav-2: #12243d;
+  --nav-hover: #294360;
+  --nav-text: #d5e3f5;
+  --nav-glow: #b8d0f2;
+
+  /* Status (reserved: state only, never series identity) */
+  --ok: #08734c;
+  --ok-soft: #e5f7ee;
+  --warn: #946012;
+  --warn-soft: #fff4df;
+  --bad: #ac3434;
+  --bad-soft: #ffeaea;
+  --info: #2458aa;
+  --info-soft: #eaf2ff;
+
+  /* Use-case identity (always shown with the use-case name): 4 = new customers, 5 = renewals */
+  --uc-new: #2458aa;
+  --uc-new-soft: #eaf2ff;
+  --uc-renew: #0b7563;
+  --uc-renew-soft: #e2f5f0;
+
+  /* Charts: categorical slot 1 + validated ordinal blue ramp (light end 2.11:1 on white) */
+  --viz-1: #2a78d6;
+  --viz-ord-1: #86b6ef;
+  --viz-ord-2: #3987e5;
+  --viz-ord-3: #1c5cab;
+  --viz-track: #eef2f7;
+
+  /* Agent story accents (case page), low chroma so cobalt stays the signal */
+  --story-intake: oklch(60% 0.12 200);
+  --story-risk: oklch(62% 0.14 45);
+  --story-insight: oklch(56% 0.14 300);
+  --story-product: oklch(58% 0.13 160);
+  --story-renewal: oklch(58% 0.15 256);
+  --story-message: oklch(60% 0.13 340);
+
+  --shadow-card: 0 2px 12px rgba(25, 57, 91, 0.05);
+  --shadow-raised: 0 8px 24px rgba(25, 57, 91, 0.09);
+
+  /* shadcn/ui contract */
+  --radius: 0.75rem;
+  --background: var(--canvas);
+  --foreground: var(--ink);
+  --card: var(--card-bg);
+  --card-foreground: var(--ink);
+  --popover: var(--card-bg);
+  --popover-foreground: var(--ink);
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-ink);
+  --secondary: var(--ice-3);
+  --secondary-foreground: var(--brand);
+  --muted: var(--ice);
+  --muted-foreground: var(--muted-ink);
+  --accent: var(--ice-2);
+  --accent-foreground: var(--ink);
+  --destructive: var(--bad);
+  --border: var(--rule);
+  --input: var(--rule-2);
+  --ring: var(--focus);
+}
+
+@theme inline {
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-jakarta);
+
+  --color-canvas: var(--canvas);
+  --color-ice: var(--ice);
+  --color-ice-2: var(--ice-2);
+  --color-ice-3: var(--ice-3);
+  --color-rule: var(--rule);
+  --color-rule-2: var(--rule-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted-ink: var(--muted-ink);
+  --color-faint: var(--faint);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-ink: var(--brand-ink);
+  --color-nav: var(--nav);
+  --color-nav-2: var(--nav-2);
+  --color-nav-hover: var(--nav-hover);
+  --color-nav-text: var(--nav-text);
+  --color-nav-glow: var(--nav-glow);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-uc-new: var(--uc-new);
+  --color-uc-new-soft: var(--uc-new-soft);
+  --color-uc-renew: var(--uc-renew);
+  --color-uc-renew-soft: var(--uc-renew-soft);
+  --color-viz-1: var(--viz-1);
+  --color-viz-ord-1: var(--viz-ord-1);
+  --color-viz-ord-2: var(--viz-ord-2);
+  --color-viz-ord-3: var(--viz-ord-3);
+  --color-viz-track: var(--viz-track);
+
+  /* Legacy names still used by the case story components */
+  --color-paper: var(--card-bg);
+  --color-paper-2: var(--ice);
+  --color-paper-3: var(--ice-2);
+  --color-story-intake: var(--story-intake);
+  --color-story-risk: var(--story-risk);
+  --color-story-insight: var(--story-insight);
+  --color-story-product: var(--story-product);
+  --color-story-renewal: var(--story-renewal);
+  --color-story-message: var(--story-message);
+
+  /* zinc-* resolve to the cool slate neutrals of this palette */
+  --color-zinc-50: var(--ice);
+  --color-zinc-100: var(--ice-2);
+  --color-zinc-200: var(--rule);
+  --color-zinc-300: var(--rule-2);
+  --color-zinc-400: var(--faint);
+  --color-zinc-500: var(--muted-ink);
+  --color-zinc-600: var(--neutral);
+  --color-zinc-700: var(--ink-2);
+  --color-zinc-800: #223349;
+  --color-zinc-900: var(--ink);
+  --color-zinc-950: var(--ink);
+
+  --shadow-card: var(--shadow-card);
+  --shadow-raised: var(--shadow-raised);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: calc(var(--radius) - 2px);
+  --radius-xl: var(--radius);
+  --radius-2xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background font-sans text-foreground;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+  h1 {
+    letter-spacing: -0.02em;
+  }
+  table {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Grid columns shrink to the viewport; wide tables scroll inside their own container instead. */
+  .grid > * {
+    min-width: 0;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+html,
+body {
+  overflow-x: clip;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

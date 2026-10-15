@@ -1,0 +1,7 @@
+id,customer_id,policy_id,recommendation_id,kind,channel,summary,actor,created_at
+crm_01a13ef5360b3dbb0177e0,cust_pf057,pol_pf057,rec_01a13eebed0324d95e2479,follow_up_approved,intermediary,Payment reminder approved,Nithisri (retention),2026-10-15T09:46:59.979315+00:00
+crm_01a13ef536739e03f1c15b,cust_pf057,pol_pf057,rec_01a13eebed0324d95e2479,message_delivered,intermediary,Subject: Payment reminder for your client,system,2026-10-15T09:47:00.083109+00:00
+crm_01a13f51bd5a507732e525,cust_pf047,pol_pf047,rec_01a13f44554c85a4fd8e3b,follow_up_approved,email_sms,Service follow up approved,Nithi (admin),2026-10-15T11:28:03.931080+00:00
+crm_01a13f51bdcaea1ef391e4,cust_pf047,pol_pf047,rec_01a13f44554c85a4fd8e3b,message_delivered,email_sms,Subject: Your Term Life Protection,system,2026-10-15T11:28:04.042832+00:00
+crm_01a13fe842c94e3a6e41bc,cust_pf029,pol_pf029,rec_01a13f4416ca418bd854ac,follow_up_approved,email_sms,Service follow up approved,Admin (admin),2026-10-15T14:12:28.490858+00:00
+crm_01a13fe8431cba50cacbc0,cust_pf029,pol_pf029,rec_01a13f4416ca418bd854ac,message_delivered,email_sms,Subject: Your Term Life Protection,system,2026-10-15T14:12:28.573953+00:00
