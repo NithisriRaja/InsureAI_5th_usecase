@@ -84,3 +84,16 @@ async def test_retention_filter_by_band(api) -> None:
         listed = (await c.get("/overview/retention", params={"band": b["key"]})).json()
         assert len(listed["customers"]) == b["count"]
         assert all(x["risk_band"] == b["key"] for x in listed["customers"])
+
+
+async def test_agent_trace_survives_restart_without_step_log(api) -> None:
+    from backend.db.models import AuditEvent
+
+    c = api
+    await wait_batch(c, (await c.post("/renewals/scan")).json()["id"])
+    rec_id = (await c.get("/recommendations", params={"limit": 1})).json()["items"][0]["id"]
+    api.app.state.db.tables[AuditEvent].clear()  # what a backend restart leaves behind
+    trace = (await c.get(f"/overview/agents/{rec_id}")).json()
+    assert all(s["status"] == "completed" for s in trace["steps"])
+    assert all("Not needed" not in s["summary"] for s in trace["steps"])
+    assert trace["steps"][1]["uses_ai"]  # retention used the AI

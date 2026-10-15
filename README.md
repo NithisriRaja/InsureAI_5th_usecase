@@ -91,9 +91,8 @@ Everything lives in `backend/data/`, one CSV file per table:
 |---|---|
 | Business data | `products.csv`, `customers.csv`, `policies.csv`, `payments.csv` |
 | Agent results | `recommendations.csv`, `approvals.csv`, `messages.csv`, `crm_activities.csv` |
-| Audit | `audit_events.csv` (every step, with time) |
 
-Kept in memory only while the app runs (no file): agent jobs and their progress, sign-in names and logins, and the AI prompts and answers. After a restart, everyone picks their name again, and any agent run that was still going is simply started again with "Run agents".
+Kept in memory only while the app runs (no file): agent jobs and their progress, sign-in names and logins, the AI prompts and answers, and the step-by-step audit log. After a restart, everyone picks their name again, and any agent run that was still going is simply started again with "Run agents".
 
 How the files are used:
 

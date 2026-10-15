@@ -127,7 +127,7 @@ async def test_memory_only_tables_write_no_csv(db: Database) -> None:
         s.add(
             Session(id="ses_m", user_id="usr_m", expires_at=datetime(2030, 1, 1, tzinfo=UTC))
         )
-    for name in ("users", "batches", "sessions", "llm_calls"):
+    for name in ("users", "batches", "sessions", "llm_calls", "audit_events"):
         assert not (db.data_dir / f"{name}.csv").exists(), name
     async with db.session() as s:  # still usable while the app runs
         assert await s.get(Batch, "bat_m") is not None

@@ -20,6 +20,7 @@ from backend.api.errors import not_found
 from backend.api.schemas.common import BatchOut
 from backend.api.session_auth import optional_actor
 from backend.db.models import (
+    Approval,
     AuditEvent,
     Batch,
     CrmActivity,
@@ -764,6 +765,41 @@ def _agent_summary(agent: str, p: dict[str, Any], rec: Recommendation) -> str:
     return ""
 
 
+def _saved_summary(agent: str, rec: Recommendation) -> str:
+    """What an agent did, read back from the stored recommendation (no step log needed)."""
+    if agent == "renewal":
+        found = "; ".join(t.get("detail") or human_key(t.get("type")) for t in rec.triggers or [])
+        return f"Found: {found}" if found else "Checked the policy's dates, payments and documents."
+    if agent == "retention":
+        lr = (rec.decisions or {}).get("lapse_risk") or {}
+        text = (
+            f"Rated risk of not renewing {lr.get('band') or rec.band} "
+            f"({lr.get('confidence') or rec.confidence} confidence) and chose "
+            f"{action_label(rec.action).lower()} by "
+            f"{CHANNEL_LABEL.get(rec.channel or '', rec.channel)}."
+        )
+        offer = rec.offer or {}
+        if offer.get("type") == "discount":
+            text += f" Discount {float(offer.get('discount_pct') or 0):g}%."
+        return text
+    if agent == "recommendation":
+        pick = _cover_pick(rec)
+        if not pick:
+            return "No extra cover fits this customer right now."
+        how = "offered in this message" if rec.action == "add_on_offer" else "kept for the adviser"
+        return f"Picked {pick.get('name')} as the best extra cover, {how}."
+    if agent == "personalisation":
+        if rec.draft_message:
+            channel = CHANNEL_LABEL.get(rec.channel or "", rec.channel)
+            return f"Drafted a {channel} message from the policy facts."
+        return "No message needed: internal task for the team."
+    return ""
+
+
+def human_key(key: str | None) -> str:
+    return (key or "").replace("_", " ")
+
+
 @router.get("/agents/{rec_id}", response_model=AgentTraceOut)
 async def agent_trace(rec_id: str, s: DbSession = Depends(db_session)) -> AgentTraceOut:
     rec = await s.get(Recommendation, rec_id)
@@ -778,44 +814,45 @@ async def agent_trace(rec_id: str, s: DbSession = Depends(db_session)) -> AgentT
     nodes = {
         e.event_type.removeprefix("node."): e for e in events if e.event_type.startswith("node.")
     }
-    created = next((e for e in events if e.event_type == "recommendation.created"), None)
-    decided = next(
-        (e for e in events if e.event_type in (f"recommendation.{d}" for d in _DECIDED)), None
-    )
-    delivered = next((e for e in events if e.event_type == "message.delivered"), None)
     calls = s.where(LLMCall, lambda x: x.run_id == rec.run_id and x.status == "ok")
+    # Every stored recommendation went through all five agents. The step log (audit events)
+    # lives in memory only, so after a restart each step is rebuilt from what the
+    # recommendation itself saved; the log, when present, adds exact times and details.
+    ai_by_agent = {"retention": "lapse_risk", "personalisation": "message_draft"}
+    approval = next(iter(s.where(Approval, lambda x: x.recommendation_id == rec.id)), None)
+    message = next(iter(s.where(Message, lambda x: x.recommendation_id == rec.id)), None)
     steps = []
     for key, title in AGENTS:
+        ev = nodes.get(key)
         if key == "workflow":
             parts = [f"Queued '{action_label(rec.action).lower()}' for {rec.queue} approval"]
             if rec.link:
                 parts.append(f"with link {rec.link['url']}")
-            if decided:
-                parts.append(
-                    f"{decided.event_type.split('.')[1].replace('_', ' ')} by {decided.actor}"
-                )
-            if delivered:
+            if approval:
+                parts.append(f"{approval.decision.replace('_', ' ')} by {approval.actor_name}")
+            if message and message.status in ("delivered", "sent"):
                 parts.append("message delivered and CRM updated")
-            steps.append(
-                AgentStep(
-                    agent=key,
-                    title=title,
-                    status="completed" if created else "waiting",
-                    at=(delivered or decided or created).ts if created else None,
-                    summary="; ".join(parts) + ".",
-                    uses_ai=False,
-                )
+            at = (
+                (message.sent_at if message and message.sent_at else None)
+                or (approval.created_at if approval else None)
+                or rec.created_at
             )
-            continue
-        ev = nodes.get(key)
+            summary = "; ".join(parts) + "."
+        else:
+            at = ev.ts if ev else rec.created_at
+            summary = _agent_summary(key, ev.payload, rec) if ev else _saved_summary(key, rec)
+        uses_ai = any(x.node == key for x in calls) or (
+            ai_by_agent.get(key) in (rec.decisions or {})
+            or (key == "recommendation" and "add_on_fit" in (rec.decisions or {}))
+        )
         steps.append(
             AgentStep(
                 agent=key,
                 title=title,
-                status="completed" if ev else "skipped",
-                at=ev.ts if ev else None,
-                summary=_agent_summary(key, ev.payload, rec) if ev else "Not needed for this case.",
-                uses_ai=any(x.node == key for x in calls),
+                status="completed",
+                at=at,
+                summary=summary,
+                uses_ai=bool(uses_ai),
             )
         )
     models = sorted({f"{x.provider} · {x.model}" for x in calls})

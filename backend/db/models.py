@@ -314,6 +314,7 @@ class AuditEvent(Record):
     """Append-only. Never updated or deleted by application code."""
 
     __table__ = "audit_events"
+    __persist__ = False  # every step, kept in memory only (the file grew without limit)
 
     id: int | None = None  # assigned on insert (1, 2, 3, ...)
     ts: datetime = field(default_factory=utcnow)
