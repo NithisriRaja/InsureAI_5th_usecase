@@ -52,13 +52,12 @@ export function ScanButton({
         return;
       }
       setBatch(b.id);
-      toast(`Agents started on ${b.run_ids.length} policies.`, "success");
+      toast("Agents started.", "success");
     },
     onError: (e) => toast(errorText(e), "error"),
   });
   const p = progress.data;
   const running = !!batch && !!p && !p.done;
-  const done = p ? p.total - (p.counts.queued ?? 0) - (p.counts.running ?? 0) : 0;
   return (
     <Button
       variant="primary"
@@ -68,7 +67,7 @@ export function ScanButton({
       busy={scan.isPending || running}
     >
       {!running && <Play className="size-4" aria-hidden />}
-      {running ? `Agents working… ${done}/${p?.total}` : label}
+      {running ? "Agents working…" : label}
     </Button>
   );
 }

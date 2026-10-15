@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { api, type RetentionOut } from "@/lib/api";
 import { day } from "@/lib/format";
 import { Badge, Card, Empty, ErrorNote, HEALTH_TONE, Loading, PageHeader, Pagination, Table, Td, RowLink } from "@/components/kit";
@@ -12,7 +12,12 @@ const LIMIT = 10;
 
 export default function RetentionPage() {
   const [offset, setOffset] = useState(0);
-  const q = useQuery({ queryKey: ["overview", "retention"], queryFn: () => api<RetentionOut>("/overview/retention") });
+  const [band, setBand] = useState<"" | "high" | "medium" | "low">("");
+  const q = useQuery({
+    queryKey: ["overview", "retention", band],
+    queryFn: () => api<RetentionOut>("/overview/retention", { query: { band } }),
+    placeholderData: keepPreviousData,
+  });
   const d = q.data;
   const scored = d ? d.bands.reduce((a, b) => a + b.count, 0) : 0;
   return (
@@ -72,9 +77,31 @@ export default function RetentionPage() {
             </Card>
           </div>
 
-          <Card title="At Risk Customers" pad={false}>
+          <Card
+            title={band ? `${band[0].toUpperCase()}${band.slice(1)} risk customers (${d.customers.length})` : `At Risk Customers (${d.customers.length})`}
+            action={
+              <label className="flex items-center gap-2 text-sm text-muted-ink">
+                Show
+                <select
+                  className="h-9 rounded-lg border border-rule-2 bg-card px-3 text-sm font-semibold text-ink focus:border-brand focus:outline-none"
+                  value={band}
+                  onChange={(e) => {
+                    setBand(e.target.value as typeof band);
+                    setOffset(0);
+                  }}
+                >
+                  <option value="">All at-risk customers</option>
+                  <option value="high">High risk</option>
+                  <option value="medium">Medium risk</option>
+                  <option value="low">Low risk</option>
+                </select>
+              </label>
+            }
+            pad={false}
+          >
+            <div className="pt-4" />
             {d.customers.length === 0 ? (
-              <Empty>No customers at risk right now.</Empty>
+              <Empty>{band ? `No customers rated ${band} risk.` : "No customers at risk right now."}</Empty>
             ) : (
               <Table head={["Customer", "Policy No.", "Risk Score", "Status", "Reason", "Suggested Action", ""]}>
                 {d.customers.slice(offset, offset + LIMIT).map((c) => (

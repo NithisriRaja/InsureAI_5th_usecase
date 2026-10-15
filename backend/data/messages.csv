@@ -14,3 +14,10 @@ Your financial adviser",delivered,1,mock-email_sms-02902d03,,2026-10-15T11:28:03
 msg_01a13fe8422af21c8e5f76,rec_01a13f4416ca418bd854ac,policy,pol_pf029,email_sms,"odette.oak.129@example.com, 971552010129","Subject: Your Term Life Protection
 
 Hi Odette, your Term Life Protection is due. If you’d like to review your Life & protection needs or talk through your monthly premium, please get in touch. Your financial adviser",delivered,1,mock-email_sms-1c8e5f76,,2026-10-15T14:12:28.330642+00:00,2026-10-15T14:12:28.502095+00:00
+msg_01a1402cd71d1f802280a2,rec_01a13ff8cf10ac56b16e51,policy,pol_pf009,email_sms,"remy.blair.109@example.com, 971552010109","Subject: Payment reminder for your Education Savings Plan
+
+Hi Rémy, your monthly payment of 525.00 USD for your Education Savings Plan has been overdue since 2026-10-05. Your cover is in grace until 2026-11-04. Please make a payment to keep things up to date.
+
+Your financial adviser
+
+Pay online: https://portal.example.com/pay/SAV-2025-01109",delivered,1,mock-email_sms-802280a2,,2026-10-15T15:27:22.909325+00:00,2026-10-15T15:27:23.079155+00:00

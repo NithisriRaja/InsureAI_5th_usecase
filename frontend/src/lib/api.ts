@@ -24,6 +24,7 @@ export type PolicyView = {
   health_label: string;
   at_risk: boolean;
   risk_score: number | null;
+  risk_band?: string | null;
   issue: string | null;
   rec_id: string | null;
   rec_status: string | null;

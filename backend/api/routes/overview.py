@@ -91,6 +91,7 @@ class PolicyView(BaseModel):
     health_label: str
     at_risk: bool
     risk_score: float | None  # 0-10 from the retention agent's latest judgement
+    risk_band: str | None = None  # high | medium | low, from the same judgement
     issue: str | None  # the most pressing lifecycle event, in words
     rec_id: str | None
     rec_status: str | None
@@ -173,6 +174,7 @@ class _Book:
             health_label=HEALTH_LABEL[health],
             at_risk=at_risk,
             risk_score=round(lr["score"] * 10, 1) if lr and lr.get("score") is not None else None,
+            risk_band=rec.band if rec else None,
             issue=a.triggers[0].detail if a and a.triggers else None,
             rec_id=rec.id if rec else None,
             rec_status=rec.status if rec else None,
@@ -400,19 +402,25 @@ def _indicators(sig: dict[str, Any]) -> set[str]:
 
 
 @router.get("/retention", response_model=RetentionOut)
-async def retention(s: DbSession = Depends(db_session)) -> RetentionOut:
+async def retention(
+    band: Literal["high", "medium", "low"] | None = Query(
+        None, description="List the customers the retention agent rated this band"
+    ),
+    s: DbSession = Depends(db_session),
+) -> RetentionOut:
     book = await _book(s)
     live = [v for v in book.views() if v.health not in ("renewed", "cancelled")]
     risky = [v for v in live if v.at_risk]
+    listed = [v for v in live if v.risk_band == band] if band else list(risky)
     seen: Counter[str] = Counter()
     for v in risky:
         a = book.assess.get(v.policy_id)
         seen.update(_indicators(a.signals if a else {}))
     bands = Counter(r.band for p in book.policies if (r := book.current_rec(p)) and r.band)
-    risky.sort(
+    listed.sort(
         key=lambda v: (-(v.risk_score or 0), v.days_to_due if v.days_to_due is not None else 9999)
     )
-    for v in risky:  # reason: the agent's own top reason when it has judged the policy
+    for v in listed:  # reason: the agent's own top reason when it has judged the policy
         rec = book.recs.get(v.policy_id) if v.rec_id else None
         reasons = ((rec.decisions or {}).get("lapse_risk") or {}).get("reasons") if rec else None
         if reasons:
@@ -438,7 +446,7 @@ async def retention(s: DbSession = Depends(db_session)) -> RetentionOut:
             )
             for k, label in sorted(INDICATORS.items(), key=lambda kv: -seen[kv[0]])
         ],
-        customers=risky,
+        customers=listed,
     )
 
 

@@ -228,12 +228,6 @@ export default function CustomerPage() {
               ))}
             </ul>
             <p className="mb-2 text-xs font-semibold text-muted-ink uppercase">They could add</p>
-            {v.eligible.some((c) => c.recommended) && r && r.action !== "add_on_offer" && (
-              <p className="mb-3 rounded-lg bg-ice p-3 text-xs text-ink-2">
-                The agent picked the best cover below. Today&apos;s message deals with something more urgent, so it
-                isn&apos;t offered yet. An adviser can raise it later.
-              </p>
-            )}
             {v.eligible.length === 0 ? (
               <p className="text-sm text-muted-ink">{v.not_eligible_reason}</p>
             ) : (

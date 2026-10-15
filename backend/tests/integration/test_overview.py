@@ -74,3 +74,13 @@ async def test_scan_can_rerun_pending_live(api) -> None:
     await wait_batch(c, live["id"])
     pending = (await c.get("/recommendations", params={"limit": 200})).json()
     assert pending["total"] == len(first["run_ids"])  # replaced, not duplicated
+
+
+async def test_retention_filter_by_band(api) -> None:
+    c = api
+    await wait_batch(c, (await c.post("/renewals/scan")).json()["id"])
+    r = (await c.get("/overview/retention")).json()
+    for b in r["bands"]:
+        listed = (await c.get("/overview/retention", params={"band": b["key"]})).json()
+        assert len(listed["customers"]) == b["count"]
+        assert all(x["risk_band"] == b["key"] for x in listed["customers"])

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import {
   BadgePlus,
+  ShieldCheck,
   Check,
   Bell,
   LayoutDashboard,
@@ -83,12 +84,17 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const path = usePathname();
   return (
     <div className="flex h-full flex-col bg-nav text-nav-text">
-      <div className="flex items-center gap-2.5 px-5 py-5">
-        <span className="grid size-9 place-items-center rounded-lg bg-brand font-display text-sm font-extrabold text-white">
-          IA
+      <Link href="/" onClick={onNavigate} className="flex items-center gap-3 px-5 py-5" aria-label="InsureAI home">
+        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#3b82f6] to-[#1d4ed8] shadow-[0_4px_14px_rgba(37,99,235,0.45)] ring-1 ring-white/15">
+          <ShieldCheck className="size-5.5 text-white" strokeWidth={2.25} aria-hidden />
         </span>
-        <span className="font-display text-lg font-bold text-white">InsureAI</span>
-      </div>
+        <span className="leading-tight">
+          <span className="block font-display text-xl font-extrabold tracking-tight text-white">
+            Insure<span className="bg-gradient-to-r from-[#60a5fa] to-[#a5b4fc] bg-clip-text text-transparent">AI</span>
+          </span>
+          <span className="block text-[11px] font-medium tracking-wide text-nav-glow/80">Renewals &amp; Retention</span>
+        </span>
+      </Link>
       <nav aria-label="Main" className="flex-1 space-y-1 px-3">
         {NAV.map(({ href, label, icon: Icon }) => {
           const active = href === "/" ? path === "/" : path.startsWith(href);
